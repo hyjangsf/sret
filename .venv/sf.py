@@ -3,9 +3,11 @@ import re, json
 import urllib.parse
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+from log import log_message
 
 class SFExploit:
 	def __init__(self, url,token='undefined'):
+		log_message('TEST START')
 		self.url = url
 		self.token = token
 		self.headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:85.0) Gecko/20100101 Firefox/85.0',
@@ -19,13 +21,19 @@ class SFExploit:
 		not_found = True
 		for endpoint in aura_endpoints:
 			try:
+				log_message('"aura:clientOutOfSync" Check' + ' --- endURL: ' + endpoint)
 				post_request = requests.post(f"{url}{endpoint}", data=post_body, headers = self.headers, verify=False)
 				response = post_request.text
+				log_message(response)
 				if 'aura:clientOutOfSync' in response:
+					log_message('"aura:clientOutOfSync" In response')
 					self.aura_endpoint = endpoint
 					not_found = False
 					break
-			except:
+				else:
+					log_message('"aura:clientOutOfSync" Not In response')
+			except Exception as e:
+				log_message('Exception: ' + e)
 				not_found = True
 		
 		if not_found:
